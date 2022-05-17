@@ -1,0 +1,180 @@
+<br><br><br>
+
+<div class="row container">
+    <div class="col-md-2"></div>
+    <div class="col-md-10">
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#EditSaveModal" data-bs-whatever="@getbootstrap">Insertar una tarea</button>
+            </div>
+            <div class="col-md-7 mb-4">
+            </div>
+            <div class="col-md-2 mb-4">
+              <button class="btn btn-primary mb-3" (click)="clearLocalStorage()">Cerrar Sesión</button>
+            </div>
+            <div class="col-md-4" *ngFor='let al of all_tasks;'>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5 class="card-title">{{al.title}}</h5>
+                            </div>
+                            <div class="col-md-4">
+                                <p *ngIf="al.state" class="text-success">Done</p>
+                                <p *ngIf="!al.state" class="text-danger">Pending</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 text-center">
+                                <p>{{ al.date_execution }}</p>
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <p>{{ al.time_execution }}</p>
+                            </div>
+                            <div class="needs-tobe-rendered" datetime="2016-06-30 09:20:00"></div>
+                            <!--<p>{{( ((new Date().getTime()) - (new Date(res.date_execution+' '+res.time_execution).getTime()))/(1000*60*60*24)}}</p>-->
+                            <!--<p>{{format(al.date_execution)}}</p>-->
+                            <!--<p>{{  Date().getDay() - Date("2013-02-20T12:01:04.753Z").getDay()}}</p>-->
+                            <hr>
+                            <div class="col-md-12">
+                                <p>{{ al.description }}</p>
+                            </div>
+                            <div class="col-md-12">
+                                <p class="card-text"><small class="text-muted">Responsable: {{al.userResponsible.username}}</small></p>
+                            </div>
+                            <div class="col-md-12">
+                                <p class="card-text"><small class="text-muted">Asignada por: {{al.userAssigned.username}}</small></p>
+                            </div>
+                        <div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <button *ngIf="typeu == '1'" class="btn btn-primary" value={{al.idtask}} data-bs-toggle="modal" data-bs-target="#EditModal" data-bs-whatever="@getbootstrap" (click)="loadonetask(al.idtask)">Editar</button>
+                        <button *ngIf="al.state == '0'" (click)="changestate(al.idtask, al.state)" class="btn btn-success" value={{al.idtask}}>Hecho</button>
+                        <button *ngIf="al.state == '1'" (click)="changestate(al.idtask, al.state)" class="btn btn-success" value={{al.idtask}}>Pendiente</button>
+                        <button *ngIf="typeu == '1'" (click)="deletetask(al.idtask)" class="btn btn-danger" value={{al.idtask}}>Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+
+
+<div class="modal fade" id="EditSaveModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ModalTitle">Editar tarea</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <!--<h2 id="taskid">Task # 01</h2>-->
+            <label for="recipient-name" class="col-form-label">Titulo:</label>
+            <input type="text" class="form-control" #titlereg>
+          </div>
+          <div class="mb-2">
+            <label for="recipient-name" class="col-form-label">Descripcion:</label>
+            <input type="text" class="form-control" #descriptionreg>
+          </div>
+          <div class="mb-2">
+              <div class="row">
+                <div class="col-md-6">
+                    <label for="recipient-name" class="col-form-label">Fecha Ejecución:</label>
+                    <input type="date" data-date-format="YYYY MM DD"  class="form-control" #datereg >
+                </div>
+                <div class="col-md-6">
+                    <label for="recipient-name" class="col-form-label">Hora:</label>
+                    <input type="time" class="form-control" #timereg>
+                </div>
+              </div> 
+          </div>
+          <div class="mb-2">
+            <label for="recipient-name" class="col-form-label">Responsable:</label>
+            <div class="input-group mb-3">
+                <select class="form-select" #respreg>
+                  <option  *ngFor='let au of all_users;' value='{{au.iduser}}'>{{au.username}}</option>
+                </select>
+              </div>
+          </div>
+          <div class="mb-2">
+            <label for="message-text" class="col-form-label">Estado:</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" #statereg>
+                <label class="form-check-label" for="flexSwitchCheckChecked">Task Status (Pending/Done)</label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" (click)='savetask(titlereg.value, descriptionreg.value, datereg.value, timereg.value, statereg.value, respreg.value)'>Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ModalTitle">Editar tarea</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <!--<h2 id="taskid">Task # 01</h2>-->
+              <label for="recipient-name" class="col-form-label">Titulo:</label>
+              <input type="text" class="form-control" #titleedit id="titleedit">
+            </div>
+            <div class="mb-2">
+              <label for="recipient-name" class="col-form-label">Descripcion:</label>
+              <input type="text" class="form-control" #descriptionedit id="descriptionedit">
+            </div>
+            <div class="mb-2">
+                <div class="row">
+                  <div class="col-md-6">
+                      <label for="recipient-name" class="col-form-label">Fecha Ejecución:</label>
+                      <input type="date" data-date-format="YYYY MM DD"  class="form-control" #dateedit id="dateedit" >
+                  </div>
+                  <div class="col-md-6">
+                      <label for="recipient-name" class="col-form-label">Hora:</label>
+                      <input type="time" class="form-control" #timeedit id="timeedit">
+                  </div>
+                </div> 
+            </div>
+            <div class="mb-2">
+              <label for="recipient-name" class="col-form-label">Responsable:</label>
+              <div class="input-group mb-3">
+                  <select class="form-select" #respedit id="respedit">
+                    <option  *ngFor='let au of all_users;' value='{{au.iduser}}'>{{au.username}}</option>
+                  </select>
+                </div>
+            </div>
+            <div class="mb-2">
+                <label for="recipient-name" class="col-form-label">Asignador:</label>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="asigedit" readonly>
+                </div>
+              </div>
+            <div class="mb-2">
+              <label for="message-text" class="col-form-label">Estado:</label>
+              <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" #stateedit id="stateedit">
+                  <label class="form-check-label" for="flexSwitchCheckChecked">Estado tarea (Pendiente/Hecho)</label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-primary" id="idedit" #idedit (click)='modifytask(idedit.value, titleedit.value, descriptionedit.value, dateedit.value, timeedit.value, stateedit.value, respedit.value)'>Aplicar Cambios</button>
+        </div>
+      </div>
+    </div>
+  </div>
